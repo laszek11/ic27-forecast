@@ -1,6 +1,6 @@
 from pyspark import pipelines as dp
 
-@dp.materialized_view(name='ic27_forecast')
+@dp.materialized_view(name='gold.ic27_forecast')
 def ic27_forecast():
     return spark.sql("""     
         WITH base AS (

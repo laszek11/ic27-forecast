@@ -35,5 +35,5 @@ def trains():
 
 
 @dp.materialized_view(name="trains_arrivals_departures")
-def trains_silver():
+def trains_arrivals_departures():
     return spark.read.table("v_trains_arrivals_departures") 
