@@ -1,0 +1,524 @@
+{
+  "datasets": [
+    {
+      "name": "ic27_forecast",
+      "displayName": "IC27 Forecast (Next Thursday)",
+      "config": {
+        "version": "1.1",
+        "source": "SELECT * FROM wojciech_dbx.bronze.ic27_forecast ORDER BY forecast_date DESC LIMIT 1\n",
+        "dimensions": [
+          {
+            "name": "forecast_date",
+            "expr": "forecast_date",
+            "displayName": "Forecast Date"
+          },
+          {
+            "name": "scheduled_arrival",
+            "expr": "scheduled_arrival",
+            "displayName": "Scheduled Arrival"
+          },
+          {
+            "name": "forecast_arrival",
+            "expr": "forecast_arrival",
+            "displayName": "Forecasted Arrival"
+          },
+          {
+            "name": "recommendation",
+            "expr": "recommendation",
+            "displayName": "Recommendation"
+          }
+        ],
+        "measures": [
+          {
+            "name": "pct_on_time_by_1600",
+            "expr": "MAX(pct_on_time_by_1600)",
+            "displayName": "% On Time by 16:00",
+            "format": {
+              "type": "percentage",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 0.0
+              }
+            }
+          },
+          {
+            "name": "avg_delay_min",
+            "expr": "MAX(avg_delay)",
+            "displayName": "Avg Delay (min)",
+            "format": {
+              "type": "number",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 1.0
+              }
+            }
+          },
+          {
+            "name": "median_delay_min",
+            "expr": "CAST(MAX(median_delay) AS DOUBLE)",
+            "displayName": "Median Delay (min)",
+            "format": {
+              "type": "number",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 0.0
+              }
+            }
+          },
+          {
+            "name": "max_delay_ever",
+            "expr": "CAST(MAX(max_delay) AS DOUBLE)",
+            "displayName": "Max Historical Delay (min)",
+            "format": {
+              "type": "number",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 0.0
+              }
+            }
+          },
+          {
+            "name": "days_of_data",
+            "expr": "CAST(MAX(days) AS DOUBLE)",
+            "displayName": "Historical Thursdays"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ic27_thursdays",
+      "displayName": "IC27 Thursdays — Historical Arrivals",
+      "config": {
+        "version": "1.1",
+        "source": "wojciech_dbx.silver.ic27_thursdays",
+        "dimensions": [
+          {
+            "name": "departureDate",
+            "expr": "departureDate",
+            "displayName": "Departure Date"
+          },
+          {
+            "name": "delay_bucket",
+            "expr": "differenceInMinutes",
+            "displayName": "Delay (min)"
+          }
+        ],
+        "measures": [
+          {
+            "name": "delay_minutes",
+            "expr": "MAX(differenceInMinutes)",
+            "displayName": "Delay (min)",
+            "format": {
+              "type": "number",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 0.0
+              }
+            }
+          },
+          {
+            "name": "ride_count",
+            "expr": "COUNT(1)",
+            "displayName": "Number of Thursdays"
+          }
+        ]
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "a8753f44",
+      "displayName": "Untitled page",
+      "layout": [
+        {
+          "widget": {
+            "name": "header_text",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## 🚂 IC27 → Tampere (TPE) — Next Thursday Arrival Forecast\n",
+                "\n",
+                "Will Jaana catch her connection? This dashboard forecasts the arrival time of IC27 at Tampere Station next Thursday based on **historical Thursday patterns**. The forecast uses the **median delay** from past Thursdays — more robust to outliers than the mean. Scheduled arrival: **15:58**. Jaana's connection departs at **16:00**, so any delay over 2 minutes means she misses it."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "forecast_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ic27_forecast",
+                  "fields": [
+                    {
+                      "name": "forecast_date",
+                      "expression": "`forecast_date`"
+                    },
+                    {
+                      "name": "scheduled_arrival",
+                      "expression": "`scheduled_arrival`"
+                    },
+                    {
+                      "name": "forecast_arrival",
+                      "expression": "`forecast_arrival`"
+                    },
+                    {
+                      "name": "recommendation",
+                      "expression": "`recommendation`"
+                    },
+                    {
+                      "name": "pct_on_time_by_1600",
+                      "expression": "`pct_on_time_by_1600`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Forecast for Next Thursday"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "forecast_date"
+                  },
+                  {
+                    "fieldName": "scheduled_arrival"
+                  },
+                  {
+                    "fieldName": "forecast_arrival"
+                  },
+                  {
+                    "fieldName": "recommendation"
+                  },
+                  {
+                    "fieldName": "pct_on_time_by_1600"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 12,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_pct_on_time",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ic27_forecast",
+                  "fields": [
+                    {
+                      "name": "measure(pct_on_time_by_1600)",
+                      "expression": "MEASURE(`pct_on_time_by_1600`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "% On Time by 16:00",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(pct_on_time_by_1600)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_median_delay",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ic27_forecast",
+                  "fields": [
+                    {
+                      "name": "measure(median_delay_min)",
+                      "expression": "MEASURE(`median_delay_min`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Median Delay (min)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(median_delay_min)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 5,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_avg_delay",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ic27_forecast",
+                  "fields": [
+                    {
+                      "name": "measure(avg_delay_min)",
+                      "expression": "MEASURE(`avg_delay_min`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Average Delay (min)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(avg_delay_min)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 5,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "methodology_text",
+            "multilineTextboxSpec": {
+              "lines": [
+                "### Forecast Method: Median Historical Delay\n",
+                "\n",
+                "**Why median?** The chart below shows IC27 occasionally has large delays (outliers). The **median** (middle value when sorted) is less sensitive to those spikes than the arithmetic mean, making it a more reliable \"typical\" delay. The histogram shows the full distribution — the skew to the right explains why the mean is higher than the median. The **2-minute threshold line** marks the critical boundary: any delay above it means Jaana misses her 16:00 connection."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_delay_by_date",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ic27_thursdays",
+                  "fields": [
+                    {
+                      "name": "departureDate",
+                      "expression": "`departureDate`"
+                    },
+                    {
+                      "name": "measure(delay_minutes)",
+                      "expression": "MEASURE(`delay_minutes`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "IC27 Delay per Thursday (min) — Reference: 2 min = 16:00",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "departureDate",
+                  "displayName": "departureDate",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(delay_minutes)",
+                  "displayName": "Delay (min)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "departureDate",
+                  "displayName": "Departure Date",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 8,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "histogram_delay",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ic27_thursdays",
+                  "fields": [
+                    {
+                      "name": "delay_bucket",
+                      "expression": "`delay_bucket`"
+                    },
+                    {
+                      "name": "measure(ride_count)",
+                      "expression": "MEASURE(`ride_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Distribution of IC27 Delays (Histogram)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "delay_bucket",
+                  "displayName": "delay_bucket",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(ride_count)",
+                  "displayName": "Number of Thursdays",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "delay_bucket",
+                  "displayName": "Delay (min)",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 10,
+            "width": 4,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
