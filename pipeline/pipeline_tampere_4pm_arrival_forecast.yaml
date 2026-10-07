@@ -1,0 +1,18 @@
+resources:
+  pipelines:
+    pipeline_tampere_4pm_arrival_forecast:
+      name: Tampere_4pm_arrival_forecast
+      libraries:
+        - file:
+            path: ../ic27-forecast/bronze/trains_arrivals_departures.py
+        - file:
+            path: ../ic27-forecast/silver/ic27_thursdays.py
+        - file:
+            path: ../ic27-forecast/gold/ic27_forecast.py
+      schema: bronze
+      continuous: false
+      development: false
+      photon: true
+      channel: CURRENT
+      catalog: wojciech_dbx
+      serverless: true

@@ -103,6 +103,11 @@
             "name": "delay_bucket",
             "expr": "differenceInMinutes",
             "displayName": "Delay (min)"
+          },
+          {
+            "name": "delay_status",
+            "expr": "CASE WHEN differenceInMinutes <= 2 THEN 'On Time' ELSE 'Late' END",
+            "displayName": "Delay Status"
           }
         ],
         "measures": [
@@ -137,12 +142,10 @@
             "name": "header_text",
             "multilineTextboxSpec": {
               "lines": [
-                "## 🚂 IC27 → Tampere (TPE) — Next Thursday Arrival Forecast\n",
+                "## 🚂 IC27 → Tampere (TPE) — Next Thursday Arrival Forecast for the 16:15 match\n",
                 "<p>&nbsp;</p>\n",
                 "\n",
-                "<span style=\"font-size: 18px;\">Will Jaana make it for the match at 16:15? This dashboard forecasts the arrival time of IC27 at Tampere Station next Thursday based on </span><span style=\"font-size: 18px;\">**historical Thursday patterns**</span><span style=\"font-size: 18px;\">. The forecast uses the </span><span style=\"font-size: 18px;\">**median delay**</span><span style=\"font-size: 18px;\"> from past Thursdays. </span>\n",
-                "\n",
-                "<span style=\"font-size: 18px;\">Scheduled arrival: </span><span style=\"font-size: 18px;\">**15:58**</span><span style=\"font-size: 18px;\">. Jaana's connection departs at </span><span style=\"font-size: 18px;\">**16:00**</span><span style=\"font-size: 18px;\">, so any delay over 2 minutes means she misses it.</span>"
+                "<span style=\"font-size:18px\">This dashboard forecasts the arrival time of IC27 at Tampere Station next Thursday based on </span><span style=\"font-size:18px\">**historical Thursday patterns**</span><span style=\"font-size:18px\">. The forecast uses the </span><span style=\"font-size:18px\">**median delay**</span><span style=\"font-size:18px\"> from past Thursdays. Scheduled arrival: </span><span style=\"font-size:18px\">**15:58**</span><span style=\"font-size:18px\">. Jaana's connection departs at </span><span style=\"font-size:18px\">**16:00**</span><span style=\"font-size:18px\">, so any delay over 2 minutes means she misses it.</span>"
               ]
             }
           },
@@ -208,9 +211,9 @@
             }
           },
           "position": {
-            "x": 0,
+            "x": 4,
             "y": 3,
-            "width": 12,
+            "width": 8,
             "height": 3
           }
         },
@@ -370,6 +373,10 @@
                   "datasetName": "ic27_thursdays",
                   "fields": [
                     {
+                      "name": "delay_status",
+                      "expression": "`delay_status`"
+                    },
+                    {
                       "name": "departureDate",
                       "expression": "`departureDate`"
                     },
@@ -432,6 +439,25 @@
                     "type": "quantitative"
                   }
                 },
+                "color": {
+                  "fieldName": "delay_status",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "On Time",
+                        "color": "#2E7D32"
+                      },
+                      {
+                        "value": "Late",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 2
+                        }
+                      }
+                    ]
+                  }
+                },
                 "label": {
                   "show": true
                 }
@@ -446,6 +472,25 @@
             "y": 9,
             "width": 12,
             "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "271644f4",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## <span style=\"text-align:center;display:block;\">Target IC27 Arrival Time</span>\n",
+                "\n",
+                "## <span style=\"text-align:center;display:block\"><span style=\"font-size:36px;line-height:1.5\">**16:00**</span></span>"
+              ],
+              "verticalAlign": "VERTICAL_ALIGN_CENTER"
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 4,
+            "height": 3
           }
         }
       ],
