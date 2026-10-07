@@ -4,8 +4,8 @@ import pandas as pd
 from datetime import date, timedelta
 
 
-@dp.materialized_view(name="v_ic27_arrivals")
-def v_ic27_arrivals():
+@dp.materialized_view(name="ic27_arrivals")
+def ic27_arrivals():
     trainNumber = 27
     
     # fetching data for the last 180 days (we could filter only for thursdays, but in bronze we can store other days to analyze for other patterns)
@@ -34,6 +34,6 @@ def v_ic27_arrivals():
     return spark.createDataFrame(df[columns])
 
 
-@dp.materialized_view(name="ic27_arrivals")
-def trains_arrivals_departures():
-    return spark.read.table("v_ic27_arrivals") 
+#@dp.materialized_view(name="ic27_arrivals")
+#def trains_arrivals_departures():
+#    return spark.read.table("v_ic27_arrivals") 
