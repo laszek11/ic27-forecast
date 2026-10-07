@@ -32,8 +32,3 @@ def ic27_arrivals():
         "scheduledTime", "actualTime", "differenceInMinutes", "cancelled",
     ]
     return spark.createDataFrame(df[columns])
-
-
-#@dp.materialized_view(name="ic27_arrivals")
-#def trains_arrivals_departures():
-#    return spark.read.table("v_ic27_arrivals") 
