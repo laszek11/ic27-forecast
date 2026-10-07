@@ -7,7 +7,7 @@ def ic27_forecast():
           SELECT
             *,
             row_number() OVER (ORDER BY departureDate DESC) AS rn   /* last thursday's scheduled time (in case of a change in timetable) */
-          FROM silver.ic27_thursdays
+          FROM silver.ic27_tpe_arrivals
           WHERE cancelled = false
             AND actualTime_local IS NOT NULL
         ),
